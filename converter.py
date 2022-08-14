@@ -5,13 +5,19 @@ import json
 
 
 def get_gambit_matrix(payoffs):
+    rows = len(payoffs)
+    cols = len(payoffs[0])
     payoff_list = []
-    indices = list(range(1, len(payoffs) * len(payoffs[0]) + 1))
-    for j in range(len(payoffs[0])):
-        for i in range(len(payoffs)):
+    indices = []
+    for j in range(rows):
+        for i in range(cols):
             ele = payoffs[i][j]
-            payoff_list.append(("", ele, -ele))
-    print(payoff_list, indices)
+            if ele == 0:
+                indices.append(0)
+            else:
+                payoff_list.append(("", ele, -ele))
+                indices.append(len(payoff_list))
+    # print(payoff_list, indices)
     return payoff_list, indices
 
 def convert_json_to_gbt(json) -> str:
@@ -48,7 +54,7 @@ NFG 1 R "{title}" {{ "{P1}" "{P1}" }}
     json['P2-strats-str'] = ' '.join(f'"{strat}"' for strat in json["P2-strats"])
     payoff_list, indices = get_gambit_matrix(json["payoffs"])
     json['payoff-list-str'] = '\n'.join(f'{{ "{payoff[0]}" {payoff[1]}, {payoff[2]} }}' for payoff in payoff_list)
-    print(json['payoff-list-str'])
+    # print(json['payoff-list-str'])
     json['indices-str'] = ' '.join([str(index) for index in indices])
     gbt = template.format(**json)
     return gbt
