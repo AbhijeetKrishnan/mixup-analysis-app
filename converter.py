@@ -9,8 +9,8 @@ def get_gambit_matrix(payoffs):
     cols = len(payoffs[0])
     payoff_list = []
     indices = []
-    for j in range(rows):
-        for i in range(cols):
+    for j in range(cols):
+        for i in range(rows):
             ele = payoffs[i][j]
             if ele == 0:
                 indices.append(0)
