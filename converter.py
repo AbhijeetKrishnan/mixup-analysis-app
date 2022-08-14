@@ -34,7 +34,7 @@ def convert_json_to_gbt(json) -> str:
 <numbers decimals="4"/>
 <game>
 <nfgfile>
-NFG 1 R "{title}" {{ "{P1}" "{P1}" }}
+NFG 1 R "{title}" {{ "{P1}" "{P2}" }}
 
 {{ {{ {P1-strats-str} }}
 {{ {P2-strats-str} }}
@@ -48,8 +48,8 @@ NFG 1 R "{title}" {{ "{P1}" "{P1}" }}
 </nfgfile>
 </game>
 </gambit:document>
-
 """
+
     json['P1-strats-str'] = ' '.join(f'"{strat}"' for strat in json["P1-strats"])
     json['P2-strats-str'] = ' '.join(f'"{strat}"' for strat in json["P2-strats"])
     payoff_list, indices = get_gambit_matrix(json["payoffs"])
