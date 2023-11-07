@@ -135,6 +135,7 @@ def download_game(mixupData: MixupData):
     with tempfile.NamedTemporaryFile(delete=False) as fp:
         fp.write(nfg.encode())
         temp_file_name = fp.name
+    # TODO: export as gambit gbt xml file
     return FileResponse(temp_file_name, filename="game.gbt")
 
 

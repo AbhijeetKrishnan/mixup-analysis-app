@@ -1,19 +1,15 @@
 <script lang="ts">
 	import type { MixupData } from '../types/mixupData.type';
-	import type { ActionData, PageData } from './$types';
+	import type { ActionData } from './$types';
 
-	export let data: PageData;
 	export let form: ActionData;
-	console.log('Page data', data);
-	console.log('Action data', form);
-
 	let formData: MixupData;
-	let fileText: string;
-	if (form !== null && typeof form !== 'string' && Object.keys(form).length !== 0) {
-		formData = form as MixupData;
-	} else if (typeof form === 'string') {
-		console.log('Action string', form);
-		fileText = form;
+
+	if (form !== null && Object.keys(form).length !== 0) {
+		formData = form['mixup'] as MixupData;
+		if ('nfg' in form) {
+			downloadFile(form['nfg'], 'game.nfg');
+		}
 	} else {
 		formData = {
 			title: 'Untitled strategic game',
@@ -32,6 +28,26 @@
 			p2_probs: null,
 			payoff: null
 		};
+	}
+	console.log(formData);
+
+	function downloadFile(text: string, fileName: string) {
+		if (typeof document !== 'undefined') {
+			const blob = new Blob([text], { type: 'text/plain' });
+			const blobURL = URL.createObjectURL(blob);
+
+			const a = document.createElement('a');
+			a.href = blobURL;
+			a.download = fileName;
+
+			a.style.display = 'none';
+			document.body.appendChild(a);
+
+			a.click();
+
+			document.body.removeChild(a);
+			URL.revokeObjectURL(blobURL);
+		}
 	}
 
 	$: {
@@ -109,17 +125,22 @@
 	<button name="analyze" type="submit" formaction="?/analyze">Analyze</button>
 
 	<button name="save" type="submit" formaction="?/download">Save</button>
-	<!-- TODO: enable downloading of file -->
 
-	<button name="load" type="submit" formaction="?/upload">Load</button>
+	<!-- TODO: implement this flow better; it should be 1. click on 'Load' button, 2. open file picker, 3. populate with values -->
+	<label for="upload-file">Load</label>
+	<input name="upload-file" type="file" accept="text/plain" formaction="?/upload" />
+	<button name="save" type="submit" formaction="?/upload">Load</button>
 </form>
 
+<!-- TODO: Analysis data doesn't persist if Save is called -->
+<!-- TODO: Separate out analysis and form data maybe? -->
+<!-- TODO: check analysis results; they don't seem to match up with wavu -->
 {#if formData.p1_probs !== null && formData.p2_probs !== null && formData.payoff !== null}
-	{#each Array(formData.rows) as _, i}
+	{#each Array(formData.p1_probs.length) as _, i}
 		<p>Strategy {i} prob: {formData.p1_probs[i][0] / formData.p1_probs[i][1]}</p>
 	{/each}
 
-	{#each Array(formData.cols) as _, i}
+	{#each Array(formData.p2_probs.length) as _, i}
 		<p>Strategy {i} prob: {formData.p2_probs[i][0] / formData.p2_probs[i][1]}</p>
 	{/each}
 

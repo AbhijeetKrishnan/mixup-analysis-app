@@ -81,28 +81,25 @@ function getMixupData(formData: FormData): MixupData {
 export const actions: Actions = {
     analyze: async ({ cookies, request }) => {
         const data = await request.formData();
-        console.log('Data', data);
         const mixupData = getMixupData(data);
-        console.log('Matrix', JSON.stringify(mixupData));
         const result = await fetch(`${backendUrl}/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(mixupData),
         });
-        console.log(result);
-        return result.json();
+        let returnVal = await result.json();
+        return { "mixup": returnVal };
     },
     download: async ({ cookies, request }) => {
         const data = await request.formData();
         const mixupData = getMixupData(data);
-        console.log('Matrix', JSON.stringify(mixupData));
         const result = await fetch(`${backendUrl}/download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(mixupData),
         });
-        console.log(result);
-        return result.text();
+        let returnVal = await result.text();
+        return { "mixup": mixupData, "nfg": returnVal };
 
     },
     upload: async ({ cookies, request }) => {
@@ -113,7 +110,6 @@ export const actions: Actions = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(mixupData),
         });
-        console.log(result);
         return result.json();
 
     },
