@@ -11,12 +11,7 @@ import uvicorn
 app = FastAPI()
 
 
-class CellData(BaseModel):
-    x: int
-    y: int
-    value: int
-
-class FormData(BaseModel):
+class MixupData(BaseModel):
     title: str = Field(default="Untitled strategic game")
     comment: str = Field(default="")
     player_1: str = Field(default="1")
@@ -25,23 +20,15 @@ class FormData(BaseModel):
     p2_strategies: List[str] = None
     rows: int
     cols: int
-    data: List[CellData]
+    data: List[List[int]]
     p1_probs: Optional[List[Optional[Tuple[int, int]]]] = None
     p2_probs: Optional[List[Optional[Tuple[int, int]]]] = None
     payoff: Optional[Tuple[int, int]] = None
 
-    def to_payoff_matrix(self) -> np.ndarray:
-        """Converts the form data to a payoff matrix"""
-
-        payoff_matrix = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
-        for cell in self.data:
-            payoff_matrix[cell.x][cell.y] = cell.value
-        return np.array(payoff_matrix)
-    
     def to_gbt(self) -> gbt.Game:
         """Converts the form data to a pygambit game"""
 
-        payoff_matrix = self.to_payoff_matrix()
+        payoff_matrix = np.array(self.data)
         game = gbt.Game.from_arrays(payoff_matrix, -payoff_matrix, title=self.title)
         
         game.players[0].label = self.player_1
@@ -66,19 +53,19 @@ class FormData(BaseModel):
         self.payoff = eqa[0].payoff(game.players[0]).as_integer_ratio()
     
     @classmethod
-    def from_gbt(cls, game: gbt.Game) -> "FormData":
+    def from_gbt(cls, game: gbt.Game) -> "MixupData":
         """Converts a pygambit game to form data with analysis results"""
 
         rows = len(game.players[0].strategies)
         cols = len(game.players[1].strategies)
-        cell_data = []
+        data = [[0 for _ in range(cols)] for _ in range(rows)]
 
-        for x in range(rows):
-            for y in range(cols):
-                value = game.outcomes[x * cols + y][game.players[0]].numerator
-                cell_data.append(CellData(x=x, y=y, value=value))
+        for i in range(rows):
+            for j in range(cols):
+                value = game.outcomes[i * cols + j][game.players[0]].numerator
+                data[i][j] = value
 
-        formData = FormData(
+        mixupData = MixupData(
             title=game.title,
             comment=game.comment,
             player_1=game.players[0].label,
@@ -87,21 +74,21 @@ class FormData(BaseModel):
             p2_strategies=[s.label for s in game.players[1].strategies],
             rows=rows,
             cols=cols,
-            data=cell_data
+            data=data
         )
-        formData.analyze()
+        mixupData.analyze()
 
-        return formData
+        return mixupData
 
 
 @app.post("/analyze")
-def analyze_game(formData: FormData):
-    formData.analyze()
-    return formData.model_dump()
+def analyze_game(mixupData: MixupData):
+    mixupData.analyze()
+    return mixupData.model_dump()
 
 @app.post("/download")
-def download_game(formData: FormData):
-    game = formData.to_gbt()
+def download_game(mixupData: MixupData):
+    game = mixupData.to_gbt()
     nfg = game.write()
     with tempfile.NamedTemporaryFile(delete=False) as fp:
         fp.write(nfg.encode())
@@ -112,8 +99,8 @@ def download_game(formData: FormData):
 async def upload_file(file: UploadFile):
     contents = await file.read()
     game = gbt.Game.parse_game(contents.decode())
-    formData = FormData.from_gbt(game)
-    return formData.model_dump()
+    mixupData = MixupData.from_gbt(game)
+    return mixupData.model_dump()
 
 
 if __name__ == "__main__":
