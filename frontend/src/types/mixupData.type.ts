@@ -7,8 +7,8 @@ export type MixupData = {
     cols: number;
     p1_strategies: string[];
     p2_strategies: string[];
-    data: number[][];
-    p1_probs: number[] | null;
-    p2_probs: number[] | null;
-    payoff: number | null;
+    matrix: number[][];
+    p1_probs: [number, number][] | null;
+    p2_probs: [number, number][] | null;
+    payoff: [number, number] | null;
 };
