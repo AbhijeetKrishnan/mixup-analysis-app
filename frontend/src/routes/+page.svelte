@@ -18,7 +18,23 @@
 		p2_probs: null,
 		payoff: null
 	};
-	export let onSubmit = () => {};
+	export let onSubmit = () => {
+		formData = {
+			title,
+			comment,
+			player_1,
+			player_2,
+			rows,
+			cols,
+			p1_strategies,
+			p2_strategies,
+			data,
+			p1_probs,
+			p2_probs,
+			payoff
+		};
+		console.log(formData);
+	};
 
 	let title = formData.title ?? 'Untitled strategic game';
 	let comment = formData.comment ?? '';
