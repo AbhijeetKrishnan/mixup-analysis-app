@@ -10,7 +10,7 @@ Based on the work done by [RodgerDodger](https://wavu.wiki/t/User:RogerDodger).
 Requires [Node.js](https://nodejs.org/en) and [Python 3](https://www.python.org/) be installed on your system.
 
 ```bash
-git clone TODO:
+git clone git@github.com:AbhijeetKrishnan/mixup-analysis-app.git
 cd mixup-analysis-app
 
 # Start backend server at http://localhost:8000/
