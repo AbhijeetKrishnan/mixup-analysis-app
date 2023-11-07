@@ -1,0 +1,5 @@
+fastapi
+pygambit
+uvicorn
+numpy
+pydantic
