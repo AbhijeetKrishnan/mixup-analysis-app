@@ -59,8 +59,8 @@ class MixupData(BaseModel):
     rows: int
     cols: int
     matrix: List[List[int]]
-    p1_probs: Optional[List[Optional[Tuple[int, int]]]] = None
-    p2_probs: Optional[List[Optional[Tuple[int, int]]]] = None
+    p1_probs: Optional[List[Tuple[int, int]]] = None
+    p2_probs: Optional[List[Tuple[int, int]]] = None
     payoff: Optional[Tuple[int, int]] = None
 
     def to_gbt(self) -> gbt.Game:
@@ -85,13 +85,16 @@ class MixupData(BaseModel):
         """Analyze the game and store the mixed strategy probabilities"""
 
         game = self.to_gbt()
+        logging.info(self.matrix)
         solver = gbt.nash.lp_solve
         eqa = solver(game)
-        self.p1_probs = [eqa[0].strategy_value(
-            strategy).as_integer_ratio() for strategy in game.players[0].strategies]
-        self.p2_probs = [eqa[0].strategy_value(
-            strategy).as_integer_ratio() for strategy in game.players[1].strategies]
-        self.payoff = eqa[0].payoff(game.players[0]).as_integer_ratio()
+        profile = eqa[0]
+        logging.info(profile)
+        self.p1_probs = [profile[game.players[0]][strategy].as_integer_ratio(
+        ) for strategy in game.players[0].strategies]
+        self.p2_probs = [profile[game.players[1]][strategy].as_integer_ratio(
+        ) for strategy in game.players[1].strategies]
+        self.payoff = profile.payoff(game.players[0]).as_integer_ratio()
 
     @classmethod
     def from_gbt(cls, game: gbt.Game) -> "MixupData":
@@ -101,10 +104,12 @@ class MixupData(BaseModel):
         cols = len(game.players[1].strategies)
         matrix = [[0 for _ in range(cols)] for _ in range(rows)]
 
-        for i in range(rows):
-            for j in range(cols):
-                value = game.outcomes[i * cols + j][game.players[0]].numerator
-                matrix[i][j] = value
+        for contingency in game.contingencies:
+            try:
+                value = game[contingency][game.players[0]]
+            except RuntimeError:  # 0 outcome results in dereferenced null pointer error on pygambit
+                value = 0
+            matrix[contingency[0]][contingency[1]] = value
 
         mixupData = MixupData(
             title=game.title,
@@ -131,11 +136,17 @@ def analyze_game(mixupData: MixupData):
 @app.post("/download")
 def download_game(mixupData: MixupData):
     game = mixupData.to_gbt()
-    nfg = game.write()
+    nfg = f"""
+<nfgfile>
+{game.write()}</nfgfile>
+
+<profile>
+{','.join([f'{r[0]}/{r[1]}' for r in mixupData.p1_probs])
+ },{','.join([f'{r[0]}/{r[1]}' for r in mixupData.p2_probs])}
+</profile>"""
     with tempfile.NamedTemporaryFile(delete=False) as fp:
         fp.write(nfg.encode())
         temp_file_name = fp.name
-    # TODO: export as gambit gbt xml file
     return FileResponse(temp_file_name, filename="game.gbt")
 
 
