@@ -85,11 +85,9 @@ class MixupData(BaseModel):
         """Analyze the game and store the mixed strategy probabilities"""
 
         game = self.to_gbt()
-        logging.info(self.matrix)
         solver = gbt.nash.lp_solve
         eqa = solver(game)
         profile = eqa[0]
-        logging.info(profile)
         self.p1_probs = [profile[game.players[0]][strategy].as_integer_ratio(
         ) for strategy in game.players[0].strategies]
         self.p2_probs = [profile[game.players[1]][strategy].as_integer_ratio(
@@ -136,8 +134,8 @@ def analyze_game(mixupData: MixupData):
 @app.post("/download")
 def download_game(mixupData: MixupData):
     game = mixupData.to_gbt()
-    nfg = f"""
-<nfgfile>
+    mixupData.analyze()
+    nfg = f"""<nfgfile>
 {game.write()}</nfgfile>
 
 <profile>

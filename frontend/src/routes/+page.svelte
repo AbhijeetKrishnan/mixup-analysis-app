@@ -264,6 +264,7 @@
 				{/each}
 			</table>
 
+			<!-- Have buttons submit to custom script in +page.ts -->
 			<div class="flex flex-row justify-center pb-5 align-middle">
 				<button
 					name="analyze"
