@@ -4,25 +4,6 @@ import type { MixupData } from '../types/mixupData.type';
 
 const backendUrl = 'http://127.0.0.1:8000';
 
-function convertToTuple(value: FormDataEntryValue | null): [number, number] | null {
-    if (value === null || typeof value !== 'string') {
-      return null;
-    }
-  
-    const parts = value.split(',').map(Number);
-    return [parts[0], parts[1]] as [number, number];
-  }
-
-function convertToTupleArray(value: FormDataEntryValue | null): [number, number][] | null {
-    if (value === null || typeof value === 'string' || value instanceof File) {
-      return null;
-    }
-  
-    return (value as string[]).map((str: string) => {
-      const parts = str.split(',').map(Number);
-      return [parts[0], parts[1]] as [number, number];
-    });
-  }
 
 function buildStrategies(formData: FormData, name: string): string[] {
     const strategies = [];
@@ -59,9 +40,6 @@ function getMixupData(formData: FormData): MixupData {
     const p1_strategies = buildStrategies(formData, '1');
     const p2_strategies = buildStrategies(formData, '2');
     const matrix = buildMatrix(formData);
-    const p1_probs = convertToTupleArray(formData.get('p1_probs'));
-    const p2_probs = convertToTupleArray(formData.get('p2_probs'));
-    const payoff = convertToTuple(formData.get('payoff'));
     return {
         title,
         comment,
@@ -72,45 +50,44 @@ function getMixupData(formData: FormData): MixupData {
         p1_strategies,
         p2_strategies,
         matrix,
-        p1_probs,
-        p2_probs,
-        payoff,
     };
 }
 
 export const actions: Actions = {
     analyze: async ({ cookies, request }) => {
-        const data = await request.formData();
-        const mixupData = getMixupData(data);
+        const formData = await request.formData();
+        const mixupData = getMixupData(formData);
+        console.log(mixupData);
         const result = await fetch(`${backendUrl}/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(mixupData),
         });
-        let returnVal = await result.json();
-        return { "mixup": returnVal };
+        let analysisData = await result.json();
+        return { "type": "analyze", "result": analysisData, "orig": mixupData };
     },
     download: async ({ cookies, request }) => {
-        const data = await request.formData();
-        const mixupData = getMixupData(data);
+        const formData = await request.formData();
+        const mixupData = getMixupData(formData);
+        console.log(mixupData);
         const result = await fetch(`${backendUrl}/download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(mixupData),
         });
-        let returnVal = await result.text();
-        return { "mixup": mixupData, "nfg": returnVal };
+        let text = await result.text();
+        return { "type": "download", "result": text, "orig": mixupData };
 
     },
     upload: async ({ cookies, request }) => {
-        const data = await request.formData();
-        const mixupData = getMixupData(data);
+        const formData = await request.formData();
+        const fileData = formData;
         const result = await fetch(`${backendUrl}/upload`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(mixupData),
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(fileData),
         });
-        return result.json();
-
+        let mixupData = await result.json();
+        return { "type": "upload", "result": mixupData, "orig": null };
     },
 } satisfies Actions;
