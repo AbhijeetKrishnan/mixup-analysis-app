@@ -9,7 +9,7 @@ services:
     depends_on:
       - backend
     environment:
-      - ORIGIN=http://127.0.0.1:3000
+      - ORIGIN=http://127.0.0.1:3000 # needs to be 127.0.0.1 and not localhost
     hostname: frontend
     ports:
       - "3000:3000"
@@ -22,8 +22,8 @@ services:
     build:
       context: ./backend
     hostname: backend
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
     volumes:
       - ./backend:/backend
     restart: on-failure
