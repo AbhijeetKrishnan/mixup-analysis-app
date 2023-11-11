@@ -3,3 +3,4 @@ pygambit
 uvicorn
 numpy
 pydantic
+python-multipart

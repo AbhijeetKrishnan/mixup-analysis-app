@@ -16,4 +16,4 @@ COPY . .
 
 RUN npm run build
 
-ENTRYPOINT [ "node", "build" ]
+ENTRYPOINT [ "ORIGIN=http://localhost:3000", "node", "build" ]
