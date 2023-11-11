@@ -1,4 +1,5 @@
 version: "3.8"
+name: mixup-analysis-app
 
 services:
   frontend:
@@ -7,6 +8,8 @@ services:
       context: ./frontend
     depends_on:
       - backend
+    environment:
+      - ORIGIN=http://127.0.0.1:3000
     hostname: frontend
     ports:
       - "3000:3000"
