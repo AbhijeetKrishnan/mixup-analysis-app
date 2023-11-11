@@ -1,5 +1,6 @@
 import type { Actions } from './$types';
 import type { MixupData } from '../types/mixupData.type';
+import { fail } from '@sveltejs/kit';
 
 
 const backendUrl = 'http://127.0.0.1:8000';
@@ -57,7 +58,6 @@ export const actions: Actions = {
     analyze: async ({ cookies, request }) => {
         const formData = await request.formData();
         const mixupData = getMixupData(formData);
-        console.log(mixupData);
         const result = await fetch(`${backendUrl}/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -69,7 +69,6 @@ export const actions: Actions = {
     download: async ({ cookies, request }) => {
         const formData = await request.formData();
         const mixupData = getMixupData(formData);
-        console.log(mixupData);
         const result = await fetch(`${backendUrl}/download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -80,14 +79,23 @@ export const actions: Actions = {
 
     },
     upload: async ({ cookies, request }) => {
+        // TODO: fix file upload request
         const formData = await request.formData();
-        const fileData = formData;
-        const result = await fetch(`${backendUrl}/upload`, {
+        const fileData = formData.get('upload_file');
+        if (!(fileData instanceof File)) {
+            return fail(400, {
+                error: true,
+                message: 'You must provide a file to upload'
+            });
+        }
+        const bytes = new Uint8Array(await fileData.arrayBuffer());
+        const outRequest = {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(fileData),
-        });
+            body: bytes,
+        }
+        console.log(outRequest);
+        const result = await fetch(`${backendUrl}/upload`, outRequest);
         let mixupData = await result.json();
-        return { "type": "upload", "result": mixupData, "orig": null };
+        return { "type": "upload", "result": mixupData };
     },
 } satisfies Actions;

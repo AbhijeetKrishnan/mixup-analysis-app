@@ -157,7 +157,7 @@ def download_game(mixupData: MixupData):
     return FileResponse(temp_file_name, filename="game.gbt")
 
 
-@app.post("/upload")
+@router.post("/upload")
 async def upload_file(file: UploadFile):
     """Receive a file and return the corresponding MixupData object"""
 

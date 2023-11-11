@@ -231,7 +231,7 @@
 			</table>
 
 			<!-- Have buttons submit to custom script in +page.ts -->
-			<div class="flex flex-row justify-center pb-5 align-middle">
+			<div class="flex flex-row justify-center justify-items-center pb-5">
 				<button
 					name="analyze"
 					class="mx-2 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
@@ -253,61 +253,92 @@
 					>
 					<span>Save</span></button
 				>
-
-				<!-- TODO: implement this flow better; it should be 1. click on 'Load' button, 2. open file picker, 3. populate with values -->
-				<!-- <label for="upload-file">Load</label>
-			<input
-				name="upload-file"
-				type="file"
-				accept="text/plain"
-				class="mx-2 w-full text-white
-		file:mr-4 file:rounded file:border-0
-		file:bg-blue-500 file:px-4
-		file:py-2
-		file:font-semibold file:text-white
-		hover:file:bg-blue-700"
-				formaction="?/upload"
-				tabindex=3
-			/>
-			<button
-				name="upload"
-				type="submit"
-				formaction="?/upload"
-				tabindex=3	
-				class="mx-2 inline-flex items-center rounded bg-gray-300 px-4 py-2 font-bold text-gray-800 hover:bg-gray-400"
-				><svg
-					class="mr-2 h-4 w-4 fill-current"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 20 19"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M15 15h.01M4 12H2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-3m-5.5 0V1.07M5.5 5l4-4 4 4"
-					/>
-				</svg><span>Load</span></button
-			> -->
 			</div>
 		</div>
 	</form>
+	<form method="POST" enctype="multipart/form-data" class="mx-auto">
+		<!-- TODO: implement this flow better; it should be 1. click on 'Load' button, 2. open file picker, 3. populate with values -->
+		<input
+			name="upload_file"
+			type="file"
+			accept=".nfg,.gbt"
+			class="-mr-15 text-white file:mx-2 file:mr-4 file:rounded file:border-0 file:bg-blue-500 file:px-4 file:py-2 file:font-bold file:text-white hover:file:bg-blue-700"
+			formaction="?/upload"
+			tabindex="3"
+		/>
+		<button
+			name="upload"
+			type="submit"
+			formaction="?/upload"
+			tabindex="3"
+			class="mx-2 inline-flex items-center rounded bg-gray-300 px-4 py-2 font-bold text-gray-800 hover:bg-gray-400"
+			><svg
+				class="mr-2 h-4 w-4 fill-current"
+				aria-hidden="true"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 20 19"
+			>
+				<path
+					stroke="currentColor"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M15 15h.01M4 12H2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-3m-5.5 0V1.07M5.5 5l4-4 4 4"
+				/>
+			</svg><span>Load</span></button
+		>
+	</form>
 
 	<!-- TODO: Analysis data doesn't persist if Save is called -->
-	<!-- TODO: Separate out analysis and form data maybe? -->
-	<!-- TODO: check analysis results; they don't seem to match up with wavu -->
-	<!-- TODO: style analysis content -->
+	<!-- TODO: page reloads to top when analysis is pressed. Try to get it to focus on the bottom -->
 	{#if currAnalysis !== undefined}
-		{#each Array(currAnalysis.p1_probs.length) as _, i}
-			<p>Strategy {i} prob: {currAnalysis.p1_probs[i][0] / currAnalysis.p1_probs[i][1]}</p>
-		{/each}
+		<div class="mx-auto mb-5 mt-5 max-w-max text-white">
+			<div class="font-base text-center text-2xl font-semibold">Payoffs</div>
+			<div class="flex w-full flex-row justify-items-center gap-x-20">
+				<div
+					class="align-items-center my-10 flex w-full flex-col rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+				>
+					<div
+						class="w-full border-b border-gray-300 text-center font-semibold dark:border-gray-600"
+					>
+						{currMixup.player_1}
+					</div>
+					{#each Array(currAnalysis.p1_probs.length) as _, i}
+						<div class="flex w-full flex-row">
+							<div class="h-fit w-1/2 px-3 text-center">{currMixup.p1_strategies[i]}</div>
+							<div class="w-1/2 px-3 text-right">
+								{currAnalysis.p1_probs[i][0] / currAnalysis.p1_probs[i][1]}
+							</div>
+						</div>
+					{/each}
+				</div>
 
-		{#each Array(currAnalysis.p2_probs.length) as _, i}
-			<p>Strategy {i} prob: {currAnalysis.p2_probs[i][0] / currAnalysis.p2_probs[i][1]}</p>
-		{/each}
+				<div
+					class="align-items-center my-10 flex flex-col rounded-lg border border-gray-300 text-white dark:border-gray-600 dark:bg-gray-700"
+				>
+					<div
+						class="w-full border-b border-gray-300 text-center font-semibold dark:border-gray-600"
+					>
+						{currMixup.player_2}
+					</div>
+					{#each Array(currAnalysis.p2_probs.length) as _, i}
+						<div class="flex w-full flex-row">
+							<div class="h-fit w-1/2 px-3 text-center">{currMixup.p2_strategies[i]}</div>
+							<div class="w-1/2 px-3 text-right">
+								{currAnalysis.p2_probs[i][0] / currAnalysis.p2_probs[i][1]}
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
 
-		<p>Payoff: {currAnalysis.payoff[0] / currAnalysis.payoff[1]}</p>
+			<div class="text-center">
+				<div>Payoff</div>
+				<div>
+					{currAnalysis.payoff[0] / currAnalysis.payoff[1]}
+				</div>
+			</div>
+		</div>
 	{/if}
 </div>
