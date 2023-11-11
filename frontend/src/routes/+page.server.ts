@@ -3,7 +3,7 @@ import type { MixupData } from '../types/mixupData.type';
 import { fail } from '@sveltejs/kit';
 
 
-const backendUrl = 'http://127.0.0.1:8000';
+const backendUrl = 'http://backend:8000';
 
 
 function buildStrategies(formData: FormData, name: string): string[] {

@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: node:latest
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    hostname: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/frontend
+    restart: always
+  
+  backend:
+    image: python:latest
+    build:
+      context: ./backend
+    hostname: backend
+    expose:
+      - "8000"
+    volumes:
+      - ./backend:/backend
+    restart: on-failure
