@@ -2,12 +2,31 @@
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-A web app to more easily create [mix-up analyses](https://wavu.wiki/t/Template:Mixup) for [Wavu Wiki](https://wavu.wiki/t/Main_Page). 
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![Svelte](https://img.shields.io/badge/svelte-%23f1413d.svg?style=for-the-badge&logo=svelte&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+
+![Mixup analysis app](assets/screenshot.png)
+
+A web app to more easily create [mix-up analyses](https://wavu.wiki/t/Template:Mixup) for [Wavu Wiki](https://wavu.wiki/t/Main_Page).
 Based on the work done by [RodgerDodger](https://wavu.wiki/t/User:RogerDodger).
 
 ## Installation
 
-Requires [Node.js](https://nodejs.org/en) and [Python 3](https://www.python.org/) be installed on your system.
+### Using Docker
+
+```bash
+git clone git@github.com:AbhijeetKrishnan/mixup-analysis-app.git
+cd mixup-analysis-app
+docker compose up -d --build
+```
+
+_Note_: Will take a _long_ time at the step to build the `pygambit` wheel!
+
+The web app will be live at http://localhost:3000/.
+
+### Without Docker
 
 ```bash
 git clone git@github.com:AbhijeetKrishnan/mixup-analysis-app.git
@@ -20,11 +39,11 @@ python3 main.py
 
 # Build frontend
 cd frontend
-npm install
+npm ci --omit-build
 npm run build
 
-# Preview frontend
-npm run preview
+# Start frontend server at http://localhost:3000/
+node build
 ```
 
-You should be able to view the website at [http://localhost:4173/](http://localhost:4173/).
+The web app will be live at http://localhost:3000/.
