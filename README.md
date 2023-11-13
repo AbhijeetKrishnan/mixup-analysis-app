@@ -39,7 +39,7 @@ python3 main.py
 
 # Build frontend
 cd frontend
-npm ci --omit-build
+npm install
 npm run build
 
 # Start frontend server at http://localhost:3000/
