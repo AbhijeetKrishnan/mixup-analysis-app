@@ -6,8 +6,6 @@ WORKDIR /frontend
 
 COPY package*.json .
 
-RUN rm -rf node_modules
-RUN rm -rf build
 RUN npm install
 
 COPY . .
