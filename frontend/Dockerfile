@@ -8,7 +8,7 @@ COPY package*.json .
 
 RUN rm -rf node_modules
 RUN rm -rf build
-RUN npm ci --omit=dev
+RUN npm install
 
 COPY . .
 

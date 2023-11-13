@@ -3,9 +3,7 @@ name: mixup-analysis-app
 
 services:
   frontend:
-    image: node:latest
-    build:
-      context: ./frontend
+    image: abhijeetkrishnan/mixup-analysis:frontend
     depends_on:
       - backend
     environment:
@@ -18,9 +16,7 @@ services:
     restart: always
   
   backend:
-    image: python:latest
-    build:
-      context: ./backend
+    image: abhijeetkrishnan/mixup-analysis:backend
     hostname: backend
     expose:
       - "8000"
