@@ -7,7 +7,7 @@ services:
     depends_on:
       - backend
     environment:
-      - ORIGIN=http://127.0.0.1:3000 # needs to be 127.0.0.1 and not localhost
+      - ORIGIN=http://18.189.182.42/
     hostname: frontend
     ports:
       - "80:3000" # HTTP requests
