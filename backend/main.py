@@ -63,7 +63,7 @@ class AnalysisData(BaseModel):
         analysisData = AnalysisData(
             p1_probs=[eqa.equilibria[0][strategy].as_integer_ratio() for strategy in game.players[0].strategies],
             p2_probs=[eqa.equilibria[0][strategy].as_integer_ratio() for strategy in game.players[1].strategies],
-            payoff=eqa[0].payoff(game.players[0]).as_integer_ratio()
+            payoff=eqa.equilibria[0].payoff(game.players[0]).as_integer_ratio()
         )
         return analysisData
 
